@@ -3,13 +3,14 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from loguru import logger
 
-from .routes import chat, embedding
-from .configs.configs import Configs_Settings
-from .dependencies import ml_models, embed_models
-from .dependencies import load_model, load_embedder
+from routes import chat, embedding
+from configs.configs import settings
+from dependencies import ml_models, embed_models
+from dependencies import load_model, load_embedder
 
 from huggingface_hub import login
-login(token=Configs_Settings.HUGGINGFACE_KEY)
+
+login(token=settings.HUGGINGFACE_KEY)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
@@ -25,8 +26,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         None: Execution will be paused to maintain lifespan context.
     """
     # Load the model and tokenizer
-    load_model(Configs_Settings.MODEL_NAME)
-    load_embedder(Configs_Settings.EMB_MODEL_NAME)
+    load_model(settings.MODEL_NAME)
+    load_embedder(settings.EMB_MODEL_NAME)
     
     # Maintain context
     yield

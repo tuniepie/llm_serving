@@ -5,8 +5,8 @@ from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from ..dependencies import ml_models, generate_response
-from ..configs.configs import Configs_Settings
+from dependencies import ml_models, generate_response
+from configs.configs import settings
 
 # Initialize router for chat-related endpoints
 router = APIRouter(
@@ -38,9 +38,9 @@ class ChatCompletionRequest(BaseModel):
         temperature (Optional[float]): Sampling temperature.
         stream (Optional[bool]): Whether to stream the response token by token.
     """
-    model: str = Configs_Settings.MODEL_NAME
+    model: str = settings.MODEL_NAME
     messages: List[ChatMessage]
-    max_tokens: Optional[int] = Configs_Settings.MAX_NEW_TOKENS
+    max_tokens: Optional[int] = settings.MAX_NEW_TOKENS
     temperature: Optional[float] = 0.1
     stream: Optional[bool] = False
 
@@ -59,7 +59,7 @@ class ChatCompletionResponse(BaseModel):
     id: str
     object: str
     created: float
-    model: str = Configs_Settings.MODEL_NAME
+    model: str = settings.MODEL_NAME
     choices: List
 
 
@@ -79,12 +79,12 @@ async def root():
     else:
         llm_service_information = {
             "status": "running",
-            "llm_serving_url": Configs_Settings.LLM_SERVING_URL,
-            "model_name": Configs_Settings.MODEL_NAME,
-            "max_new_tokens": Configs_Settings.MAX_NEW_TOKENS,
-            "device": Configs_Settings.DEVICE,
-            "do_sample": Configs_Settings.DO_SAMPLE,
-            "skip_special_tokens": Configs_Settings.SKIP_SPECIAL_TOKENS,
+            "llm_serving_url": settings.LLM_SERVING_URL,
+            "model_name": settings.MODEL_NAME,
+            "max_new_tokens": settings.MAX_NEW_TOKENS,
+            "device": settings.DEVICE,
+            "do_sample": settings.DO_SAMPLE,
+            "skip_special_tokens": settings.SKIP_SPECIAL_TOKENS,
         }
 
     return llm_service_information

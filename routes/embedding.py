@@ -3,8 +3,8 @@ from typing import List
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from ..dependencies import embed_models, embed_texts
-from ..configs.configs import Configs_Settings
+from dependencies import embed_models, embed_texts
+from configs.configs import settings
 
 # Initialize router for embedding-related endpoints
 router = APIRouter(
@@ -38,7 +38,7 @@ class EmbedRequest(BaseModel):
         user (str): A unique identifier representing your end-user.
     """
     input: List[str] = [""]
-    model: str = Configs_Settings.EMB_MODEL_NAME
+    model: str = settings.EMB_MODEL_NAME
     encoding_format: str = "float"
     dimensions: int = "512"
     user: str = "007"
@@ -55,7 +55,7 @@ class EmbedResponse(BaseModel):
     """
     object: str = "list"
     data: List[EmbeddingObject]
-    model: str = Configs_Settings.EMB_MODEL_NAME
+    model: str = settings.EMB_MODEL_NAME
 
 
 
@@ -75,10 +75,10 @@ async def root():
     else:
         embed_service_information = {
             "status": "running",
-            "embedding_serving_url": Configs_Settings.EMB_SERVING_URL,
-            "model_name": Configs_Settings.EMB_MODEL_NAME,
-            "chunk_size": Configs_Settings.CHUNK_SIZE,
-            "embedding_dim": Configs_Settings.EMBEDDING_DIM,
+            "embedding_serving_url": settings.EMB_SERVING_URL,
+            "model_name": settings.EMB_MODEL_NAME,
+            "chunk_size": settings.CHUNK_SIZE,
+            "embedding_dim": settings.EMBEDDING_DIM,
         }
 
     return embed_service_information

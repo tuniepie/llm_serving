@@ -10,7 +10,7 @@ from queue import Queue
 import uuid
 import time
 
-from configs.configs import Configs_Settings
+from configs.configs import settings
 
 # ==========================
 # Global ML Models, Embedder Registry
@@ -29,7 +29,7 @@ def load_model(model_name):
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype="auto",
-        device_map=Configs_Settings.DEVICE,  # Adjust device as needed
+        device_map=settings.DEVICE,  # Adjust device as needed
         trust_remote_code=True
     )
     tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -45,7 +45,7 @@ def load_embedder(model_name):
     embedder = AutoModel.from_pretrained(
         model_name,
         torch_dtype="auto",
-        device_map=Configs_Settings.DEVICE
+        device_map=settings.DEVICE
     )
     embed_tokenizer = AutoTokenizer.from_pretrained(model_name)
     embedder.eval()
@@ -55,7 +55,7 @@ def load_embedder(model_name):
     embed_models["tokenizers"][model_name] = embed_tokenizer
     logger.info("Embedder added to embed_models.")
 
-def check_model_name_format(model_name: str=Configs_Settings.MODEL_NAME):
+def check_model_name_format(model_name: str=settings.MODEL_NAME):
     if len(model_name.split("/")) < 2:
         return False
     return True
@@ -92,7 +92,7 @@ class CustomStreamer(TextIteratorStreamer):
             Retrieves the next item from the text queue. Raises StopIteration if the stop signal is encountered.
     """
     def __init__(
-        self, tokenizer: "AutoTokenizer", model_name=Configs_Settings.MODEL_NAME, skip_prompt: bool = False, timeout: Optional[float] = None, **decode_kwargs
+        self, tokenizer: "AutoTokenizer", model_name=settings.MODEL_NAME, skip_prompt: bool = False, timeout: Optional[float] = None, **decode_kwargs
     ):
         super().__init__(tokenizer, skip_prompt, **decode_kwargs)
         self.text_queue = Queue()
@@ -136,7 +136,7 @@ class CustomStreamer(TextIteratorStreamer):
             return value
 
 
-def generate_response(prompt: list, model_name: str = Configs_Settings.MODEL_NAME, stream: bool = False) -> Union[str, Generator[str, None, None]]:
+def generate_response(prompt: list, model_name: str = settings.MODEL_NAME, stream: bool = False) -> Union[str, Generator[str, None, None]]:
     """
     Generate a text response from the model, either as a complete string or streamed token-by-token.
     
@@ -157,8 +157,8 @@ def generate_response(prompt: list, model_name: str = Configs_Settings.MODEL_NAM
         raise HTTPException(status_code=500, detail="RAG service is not initialized.")
 
     if not check_model_name_format(model_name):
-        logger.error(f"Model name format is invalid. Use default model: {Configs_Settings.MODEL_NAME}")
-        model_name = Configs_Settings.MODEL_NAME
+        logger.error(f"Model name format is invalid. Use default model: {settings.MODEL_NAME}")
+        model_name = settings.MODEL_NAME
 
     if model_name not in ml_models["models"] or model_name not in ml_models["tokenizers"]:
         load_model(model_name)
@@ -179,18 +179,18 @@ def generate_response(prompt: list, model_name: str = Configs_Settings.MODEL_NAM
     # Configure generation parameters
     generation_kwargs = dict(
         model_inputs, 
-        max_new_tokens=Configs_Settings.MAX_NEW_TOKENS,
-        do_sample=Configs_Settings.DO_SAMPLE
+        max_new_tokens=settings.MAX_NEW_TOKENS,
+        do_sample=settings.DO_SAMPLE
     )
 
     if not stream:
         # Generate full response
         output = model.generate(**generation_kwargs)
-        generated_text = tokenizer.decode(output[0], skip_prompt=True, skip_special_tokens=Configs_Settings.SKIP_SPECIAL_TOKENS)
+        generated_text = tokenizer.decode(output[0], skip_prompt=True, skip_special_tokens=settings.SKIP_SPECIAL_TOKENS)
         return generated_text
     else:
         # Use TextIteratorStreamer for token-by-token generation
-        streamer = CustomStreamer(tokenizer, model=model_name, skip_prompt=True, skip_special_tokens=Configs_Settings.SKIP_SPECIAL_TOKENS)
+        streamer = CustomStreamer(tokenizer, model=model_name, skip_prompt=True, skip_special_tokens=settings.SKIP_SPECIAL_TOKENS)
 
         # Run generation in a separate thread
         generation_kwargs["streamer"] = streamer
@@ -198,7 +198,7 @@ def generate_response(prompt: list, model_name: str = Configs_Settings.MODEL_NAM
         thread.start()
         return streamer
 
-def embed_texts(texts: List[str], model_name: str=Configs_Settings.EMB_MODEL_NAME) -> List[List[float]]:
+def embed_texts(texts: List[str], model_name: str=settings.EMB_MODEL_NAME) -> List[List[float]]:
     """
     Generate embeddings for a list of input texts.
 
@@ -216,8 +216,8 @@ def embed_texts(texts: List[str], model_name: str=Configs_Settings.EMB_MODEL_NAM
         raise HTTPException(status_code=500, detail="RAG service is not initialized.")
 
     if not check_model_name_format(model_name):
-        logger.error(f"Model name format is invalid. Use default model: {Configs_Settings.MODEL_NAME}")
-        model_name = Configs_Settings.MODEL_NAME
+        logger.error(f"Model name format is invalid. Use default model: {settings.MODEL_NAME}")
+        model_name = settings.MODEL_NAME
 
     if model_name not in embed_models["models"] or model_name not in embed_models["tokenizers"]:
         load_embedder(model_name)
@@ -229,7 +229,7 @@ def embed_texts(texts: List[str], model_name: str=Configs_Settings.EMB_MODEL_NAM
         embeddings = []
         for text in texts:
             # Tokenize inputs
-            input = embed_tokenizer(text, padding=True, truncation=True, return_tensors="pt").to(Configs_Settings.DEVICE)
+            input = embed_tokenizer(text, padding=True, truncation=True, return_tensors="pt").to(settings.DEVICE)
             
             # Compute embeddings
             with torch.no_grad():

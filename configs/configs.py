@@ -11,7 +11,8 @@ class Configs_Settings(BaseSettings):
     # LLM 
     LLM_SERVING_URL: str = Field(default="http://localhost:8001")
     MAX_NEW_TOKENS: int = Field(default=512)
-    MODEL_NAME: str = Field(default="bigscience/bloomz-1b1")
+    MODEL_NAME: str = Field(default="Qwen/Qwen2.5-3B-Instruct")
+    # Qwen/Qwen2.5-3B-Instruct bigscience/bloomz-1b1
     DEVICE: str = Field(default="cuda:1")  # Change as needed
     DO_SAMPLE: bool = Field(default=True)
     SKIP_SPECIAL_TOKENS: bool = Field(default=True)

@@ -9,10 +9,10 @@ This is the quick guide to using the APIs for serving models.
 To run the APIs seperately, go to the root directory: `trash-solution/` and run
 
 ```
-uvicorn services.models.model_serving.main:app --host 0.0.0.0 --port 8001
+uvicorn main:app --host 0.0.0.0 --port 8001
 ```
 
-We've already started a model serving on the server `172.16.87.75:8001`. You can test APIs by using the example code below:
+We've already started a model serving on the server `localhost:8001`. You can test APIs by using the example code below:
 
 ```python
 import os
@@ -22,7 +22,7 @@ os.environ['NO_PROXY'] = "*"
 
 client = OpenAI(
     api_key="OPENAI_API_KEY",  # This is the default and can be omitted
-    base_url = "http://172.16.87.75:8001/"
+    base_url = "http://localhost:8001/"
 )
 
 stream = client.chat.completions.create(
