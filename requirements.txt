@@ -1,5 +1,15 @@
-fastapi
-uvicorn
-loguru
-transformers
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+fastapi==0.112.4
+loguru==0.7.2
+python-dotenv==1.0.1
+pydantic==2.10.6
+pydantic-settings==2.8.1
+pydantic_core==2.27.2
+uvicorn==0.25.0
+sentence-transformers==2.7.0
+transformers==4.50.0
+# install pytorch
+torch==1.13.1
+torchaudio==0.13.1
+torchmetrics==1.4.1
+torchvision==0.14.1
+pytorch-lightning==2.3.3
