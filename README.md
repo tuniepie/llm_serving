@@ -6,7 +6,7 @@ This is the quick guide to using the APIs for serving models.
 
 ### How to run
 
-To run the APIs seperately, go to the root directory: `trash-solution/` and run
+To run the APIs seperately, go to the root directory: `llm_serving/` and run
 
 ```
 uvicorn main:app --host 0.0.0.0 --port 8001
@@ -98,7 +98,7 @@ print(generated_text)
     {
         "status": "running",
         "llm_serving_url": "http://localhost:8001",
-        "model_name": "Qwen/Qwen2.5-3B-Instruct",
+        "model_name": "bigscience/bloomz-1b1",
         "max_new_tokens": 1024,
         "device": "cuda:1",
         "do_sample": true,
@@ -119,8 +119,22 @@ print(generated_text)
 - **Request body:** 
     - `ChatCompletionRequest`: A JSON body containing the input prompt. Example:
         ```json
+        <!-- For Bloom model:  -->
         {
-            "model": "model name",
+            "model": "bigscience/bloomz-1b1",
+            "messages": [
+                {
+                "role": "string",
+                "content": "Translate to English: Je t’aime."
+                }
+            ],
+            "max_tokens": 512,
+            "temperature": 0.1,
+            "stream": false
+            }
+        <!-- For orther model -->
+        {
+            "model": "Qwen/Qwen2.5-3B-Instruct",
             "messages": [
                 {
                     "role": "system",
@@ -131,8 +145,11 @@ print(generated_text)
                     "content": "Hello! Talk about the News."
                 }
             ],
-            "stream": False,
+            "max_tokens": 512,
+            "temperature": 0.1,
+            "stream": false
         }
+        
         ```
 - **Returns:** A JSON body containing the output. Example:
     ```json
