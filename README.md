@@ -124,7 +124,6 @@ print(generated_text)
             "model": "bigscience/bloomz-1b1",
             "messages": [
                 {
-                "role": "string",
                 "content": "Translate to English: Je t’aime."
                 }
             ],
