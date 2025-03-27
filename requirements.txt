@@ -13,3 +13,4 @@ torchaudio==0.13.1
 torchmetrics==1.4.1
 torchvision==0.14.1
 pytorch-lightning==2.3.3
+accelerate==0.34.2
