@@ -9,6 +9,8 @@ This is the quick guide to using the APIs for serving models.
 To run the APIs seperately, go to the root directory: `llm_serving/` and run
 
 ```
+pip install -r requirements.txt
+# pip install -r requirements_backup.txt
 uvicorn main:app --host 0.0.0.0 --port 8001
 ```
 
