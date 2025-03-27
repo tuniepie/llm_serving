@@ -167,12 +167,14 @@ def generate_response(prompt: list, model_name: str = settings.MODEL_NAME, strea
     tokenizer = ml_models["tokenizers"][model_name]
 
     # Prepare input text with chat history and generation prompt
-    input_text = tokenizer.apply_chat_template(
-        prompt,
-        tokenize=False,
-        add_generation_prompt=True
-    )
-
+    
+    if "bloom" in model_name:  # Handle Bloom models separately
+        input_text = f"{prompt[0].content}\n"  # Bloom models work well with plain text prompts
+    else:
+        # Apply chat template for other models
+        input_text = tokenizer.apply_chat_template(
+            prompt, tokenize=False, add_generation_prompt=True
+        )
     # Tokenize input for the model
     model_inputs = tokenizer([input_text], return_tensors="pt").to(model.device)
 

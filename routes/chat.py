@@ -23,7 +23,7 @@ class ChatMessage(BaseModel):
         role (str): The role of the message sender (e.g., "user" or "assistant").
         content (str): The content of the message.
     """
-    role: str
+    role: Optional[str]
     content: str
 
 
